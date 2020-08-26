@@ -11,16 +11,37 @@
 </head>
 <body>
     <div class="layui-fluid">
+        <!-- 每个板块的间隔为15px -->
         <div class="layui-row layui-col-space15">
-            <div class="layui-col-sm12">
+            <!-- 1. 折线图板块 -->
+            <div class="layui-col-md6">
                 <div class="layui-card">
                     <div class="layui-card-header">标准折线图</div>
                     <div class="layui-card-body">
-                        <div id="EchartXian" style="width: 500px;height: 500px;"></div>
+                        <div id="EchartXian" style="width: 500px; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 2. 柱状图板块 -->
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header">标准柱状图</div>
+                    <div class="layui-card-body">
+                        <div id="EchartZhu" style="width: 500px; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 3. 饼状图板块 -->
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">标准饼状图</div>
+                    <div class="layui-card-body">
+                        <div id="EchartBing" style="width: 500px; height: 500px;"></div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
     <script src="../../layuiadmin/layui/layui.js"></script>
     <script>
@@ -32,7 +53,6 @@
             //-- 1. 定义变量
             var echarts = layui.echarts
             ,$ = layui.jquery;
-            console.log(echarts);
             //-- 2. 初始化折线图
             var chartXian = echarts.init(document.getElementById('EchartXian'));
             //-- 3. 准备数据（在这里我没有取后台取数据，相信这个很简单）
@@ -75,6 +95,92 @@
             //-- 4. 利用数据进行渲染
             chartXian.setOption(optionchartZhe,true);
 
+            //-- 5. 初始化柱状图
+            var chartZhu = echarts.init(document.getElementById('EchartZhu'));
+
+            //-- 6. 准备柱状图数据（可以发ajax请求到后台取数据）
+            var optionchartZhu = {
+                title: {
+                    text: '商品订单'
+                },
+                tooltip: {},
+                legend: {
+                    data: ['销量']
+                },
+                xAxis: {
+                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周天']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    name: '销量',
+                    type: 'bar', //柱状
+                    data: [100,200,300,400,500,600,700],
+                    itemStyle: {
+                        normal: { //柱子颜色
+                            color: 'red'
+                        }
+                    },
+                },{
+                    name:'产量',
+                    type:'bar',
+                    data:[120,210,340,430,550,680,720],
+                    itemStyle:{
+                        normal:{
+                            color:'blue'
+                        }
+                    }
+                }]
+            };
+
+            //-- 7. 利用数据进行渲染
+            chartZhu.setOption(optionchartZhu,true);
+
+            //-- 8. 初始化饼状图
+            var chartBing = echarts.init(document.getElementById('EchartBing'));
+
+            //-- 9. 准备饼状图数据（真实的开发中到后台获取真实的数据即可）
+            var optionchartBing = {
+                title: {
+                    text: '商品订单',
+                    subtext: '纯属虚构', //副标题
+                    x: 'left' //标题居中
+                },
+                tooltip: {
+                    // trigger: 'item' //悬浮显示对比
+                },
+                legend: {
+                    orient: 'vertical', //类型垂直,默认水平
+                    left: 'left', //类型区分在左 默认居中
+                    data: ['单价', '总价', '销量', '产量']
+                },
+                series: [{
+                    type: 'pie', //饼状
+                    radius: '60%', //圆的大小
+                    center: ['50%', '50%'], //居中
+                    data: [{
+                        value: 335,
+                        name: '单价'
+                    },
+                        {
+                            value: 310,
+                            name: '总价'
+                        },
+                        {
+                            value: 234,
+                            name: '销量'
+                        },
+                        {
+                            value: 135,
+                            name: '产量'
+                        }
+                    ]
+                }]
+            };
+
+            //-- 10. 利用数据进行渲染
+            chartBing.setOption(optionchartBing,true);
         });
     </script>
 </body>
