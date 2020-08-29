@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加文章-样板</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-spa15">
+            <div class=""layui-col-md12>
+                <div class="layui-card">
+                    <div class="layui-card-header">发布文章</div>
+                    <div class="layui-card-body">
+                        <form class="layui-form" action="" lay-filter="component-form-group">
+                            <!-- 1. 文章标题 -->
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">标题</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <!-- 2. 文章摘要 -->
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">文章摘要</label>
+                                <div class="layui-input-block">
+                                    <textarea id="acticleSummary" name="summary" placeholder="请输入文章摘要" class="layui-textarea"></textarea>
+                                </div>
+                            </div>
+                            <!-- 3. 文章缩略图 -->
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">文章缩微图</label>
+                                <div class="layui-input-block">
+                                    <div class="layui-upload-drag" id="test-upload-drag">
+                                        <img class="layui-upload-img" id="test-upload-normal-img">
+                                        <i class="layui-icon"></i>
+                                        <p>点击上传，或将文件拖拽到此处</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 4. 文章内容 -->
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">文章内容</label>
+                                <div class="layui-input-block">
+                                    <div id="content" name="content"></div>
+                                </div>
+                            </div>
+                            <!-- 5. 发布 -->
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="publishArticle">发布</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="../../layuiadmin/wangeditor/wangEditor.min.js"></script>
+    <script>
+        layui.config({
+            base: '../../layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index','form','jquery','upload'],function(){
+            //-- 1. 定义表单
+            var $ = layui.jquery
+                ,upload = layui.upload
+                ,form = layui.form;
+            form.render(null,"component-form-group");
+            //-- 2. 拖拽上传缩微图
+            var thumbnailUrl;
+            upload.render({
+                elem: '#test-upload-drag'
+                ,url: layui.setter.host.apiurl+'/uploadAticleThumbnail'
+                ,method: 'POST'
+                ,before: function(obj){
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function(index, file, result){
+                        $('.layui-upload-drag i').remove();
+                        $('.layui-upload-drag p').remove();
+                        $('#test-upload-normal-img').attr('src', result); //图片链接（base64）
+                    });
+                }
+                ,done: function(res){
+                    //-- console.log(res.data);
+                    //-- console.log(res.data.src);
+                    //var aaa= res.data;
+                    //console.log(aaa.src);
+                    thumbnailUrl = res.data.src;
+                }
+            });
+            //-- 3. 利用wangEditor富文本编辑器
+            var E = window.wangEditor
+            var editor = new E('#content')
+            editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+            editor.create();
+
+            //-- 4. 发布
+            form.on('submit(publishArticle)',function(data){
+                //-- 准备好表单提交数据
+                var title = data.field['title'];
+                var summary = data.field['summary'];
+                var content = editor.txt.html();
+                var publisher = "ranji";   //-- 发布人先写为静态的，将来获取登陆的人的用户名即可
+                parent.layer.alert(thumbnailUrl,'缩略图访问路径');
+                //-- 发送ajax请求，发布文章
+                $.ajax({
+                    url:layui.setter.host.apiurl+'/addarticle',
+                    async : false,
+                    type : "POST",
+                    dataType:"json",
+                    data:{title:title,summary:summary,thumbnailUrl:thumbnailUrl,content:content,publisher:publisher},
+                    success:function(data){
+                        parent.layer.msg('发布成功！');
+                    },
+                    error:function(res){
+                        parent.layer.msg('发布失败！');
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>

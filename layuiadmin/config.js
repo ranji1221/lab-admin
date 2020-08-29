@@ -109,7 +109,7 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
     }
     //-- 服务器主机地址
     ,host: {
-      apiurl : 'http://192.168.3.30:8080/lab'
+      apiurl : 'http://192.168.0.135:8080/lab'
     }
   });
 });
