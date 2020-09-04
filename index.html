@@ -6,12 +6,21 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!-- 这里引入jquery是因为下面的js需要用到jquery，所以这里就不使用layui的jquery模块了 -->
+    <script src="./layuiadmin/assets/js/jquery/jquery-3.5.1.min.js"></script>
+    <script src="./layuiadmin/assets/js/jquery/jquery.cookie.js"></script>
+    <!-- 该js校验用户是否登陆，没有的话就跳转到登陆界面，虽然这种处理的方式效果不好，但是先就这个样子吧 -->
+    <script>
+        $().ready(function(){
+            var name = $.cookie('name');
+            if(!name || name == 'null'){
+                $(window).attr('location','login.html');
+            }
+            return false;
+        });
+    </script>
     <link rel="stylesheet" href="./layuiadmin/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="./layuiadmin/style/admin.css" media="all">
-
-    <script>
-  /^http(s*):\/\//.test(location.href) || alert('请先部署到 localhost 下再访问');
-    </script>
 </head>
 <body class="layui-layout-body">
 
@@ -66,13 +75,13 @@
                     </li>
                     <li class="layui-nav-item" lay-unselect>
                         <a href="javascript:;">
-                            <cite>贤心</cite>
+                            <cite id="userName">贤心</cite>
                         </a>
                         <dl class="layui-nav-child">
                             <dd><a lay-href="set/user/info.html">基本资料</a></dd>
                             <dd><a lay-href="set/user/password.html">修改密码</a></dd>
                             <hr>
-                            <dd layadmin-event="logout" style="text-align: center;"><a>退出</a></dd>
+                            <dd style="text-align: center;"><a id="logout">退出</a></dd>
                         </dl>
                     </li>
 
@@ -477,11 +486,24 @@
 
     <script src="./layuiadmin/layui/layui.js"></script>
     <script>
-  layui.config({
-    base: './layuiadmin/' //静态资源所在路径
-  }).extend({
-    index: 'lib/index' //主入口模块
-  }).use('index');
+      layui.config({
+        base: './layuiadmin/' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index'],function () {
+          //-- 1. 从Cookie中获取登陆的用户名
+          let userName = $.cookie("name");
+          //-- 2. 把用户名显示出来
+          $('#userName').text(userName);
+          //-- 3. 处理退出
+          $(document).on('click', '#logout', function(data) {
+              //-- 1. 删除Cookie中的用户信息
+              $.cookie("name",null);
+              $.cookie("id",null);
+              //-- 2. 跳转到登陆页面
+              $(window).attr('location','login.html');
+          });
+      });
     </script>
 </body>
 </html>
